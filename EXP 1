@@ -1,0 +1,84 @@
+from collections import deque
+
+GOAL_STATE = ((1, 2, 3),
+              (4, 5, 6),
+              (7, 8, 0))
+
+MOVES = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+
+def is_solvable(puzzle):
+    """Check if the puzzle is solvable."""
+    flat_puzzle = [tile for row in puzzle for tile in row if tile != 0]
+    inversions = sum(
+        flat_puzzle[i] > flat_puzzle[j]
+        for i in range(len(flat_puzzle))
+        for j in range(i + 1, len(flat_puzzle))
+    )
+    return inversions % 2 == 0
+
+
+def find_empty(puzzle):
+    """Find the position of the empty space (0)."""
+    for i, row in enumerate(puzzle):
+        for j, tile in enumerate(row):
+            if tile == 0:
+                return i, j
+
+
+def swap_positions(puzzle, pos1, pos2):
+    """Swap two positions in the puzzle."""
+    puzzle = [list(row) for row in puzzle] 
+    puzzle[pos1[0]][pos1[1]], puzzle[pos2[0]][pos2[1]] = (
+        puzzle[pos2[0]][pos2[1]],
+        puzzle[pos1[0]][pos1[1]],
+    )
+    return tuple(tuple(row) for row in puzzle) 
+
+
+def bfs_solver(start):
+    """Solve the sliding puzzle using BFS."""
+    if start == GOAL_STATE:
+        return []
+
+    queue = deque([(start, [])])
+    visited = set()
+    visited.add(start)
+
+    while queue:
+        current_state, path = queue.popleft()
+        empty_pos = find_empty(current_state)
+
+        for move in MOVES:
+            new_pos = (empty_pos[0] + move[0], empty_pos[1] + move[1])
+
+            if 0 <= new_pos[0] < 3 and 0 <= new_pos[1] < 3: 
+                new_state = swap_positions(current_state, empty_pos, new_pos)
+
+                if new_state not in visited:
+                    visited.add(new_state)
+                    new_path = path + [new_state]
+
+                    if new_state == GOAL_STATE:
+                        return new_path
+
+                    queue.append((new_state, new_path))
+
+    return None 
+
+
+start_state = (
+    (1, 2, 3),
+    (4, 5, 6),
+    (0, 7, 8),
+)
+
+if is_solvable(start_state):
+    solution = bfs_solver(start_state)
+    print("Solution:")
+    for step in solution:
+        for row in step:
+            print(row)
+        print()
+else:
+    print("The puzzle is not solvable.")
