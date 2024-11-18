@@ -1,0 +1,55 @@
+from collections import deque
+
+def water_jug_problem():
+    """Solve the Water Jug Problem using BFS."""
+    jug1_capacity = 4  
+    jug2_capacity = 3  
+    goal = (2, 0)      
+    
+    initial_state = (0, 0) 
+
+    queue = deque([initial_state])
+    visited = set()
+    visited.add(initial_state)
+
+    parent = {initial_state: None}
+
+    def generate_next_states(state):
+        """Generate all possible valid states from the current state."""
+        jug1, jug2 = state
+        possible_states = [
+            (jug1_capacity, jug2),  
+            (jug1, jug2_capacity),  
+            (0, jug2),              
+            (jug1, 0),             
+            (max(0, jug1 + jug2 - jug2_capacity), min(jug2_capacity, jug1 + jug2)),  
+            (min(jug1_capacity, jug1 + jug2), max(0, jug1 + jug2 - jug1_capacity)) 
+        ]
+        return [new_state for new_state in possible_states if new_state not in visited]
+
+    while queue:
+        current_state = queue.popleft()
+
+        if current_state == goal:
+            path = []
+            while current_state is not None:
+                path.append(current_state)
+                current_state = parent[current_state]
+            return path[::-1] 
+
+        for next_state in generate_next_states(current_state):
+            queue.append(next_state)
+            visited.add(next_state)
+            parent[next_state] = current_state
+
+    return None
+
+
+solution = water_jug_problem()
+
+if solution:
+    print("Solution found!")
+    for step, state in enumerate(solution):
+        print(f"Step {step}: Jug1 = {state[0]} gallons, Jug2 = {state[1]} gallons")
+else:
+    print("No solution found.")
