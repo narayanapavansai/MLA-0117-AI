@@ -1,0 +1,39 @@
+from itertools import permutations
+
+def is_valid_mapping(strings, target, mapping):
+    """Check if the mapping satisfies the condition."""
+    def encode(string):
+        """Encode a string using the current mapping."""
+        return int("".join(str(mapping[ch]) for ch in string))
+    
+    total = sum(encode(string) for string in strings)
+    
+    target_value = encode(target)
+    
+    return total == target_value
+
+def solve_cryptarithm(arr, target):
+    """Solve the cryptarithm problem."""
+    unique_letters = set("".join(arr + [target]))
+    
+    if len(unique_letters) > 10:
+        return "No"
+    
+    for perm in permutations(range(10), len(unique_letters)):
+        mapping = dict(zip(unique_letters, perm))
+        
+        if any(mapping[word[0]] == 0 for word in arr + [target]):
+            continue
+        
+        if is_valid_mapping(arr, target, mapping):
+            print("Yes")
+            print("Mapping:", mapping)
+            return "Yes"
+    
+    return "No"
+
+arr = ["SEND", "MORE"]
+target = "MONEY"
+
+result = solve_cryptarithm(arr, target)
+print("Result:", result)
