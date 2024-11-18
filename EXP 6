@@ -1,0 +1,72 @@
+from collections import deque
+
+def is_valid_move(grid, x, y, visited):
+    """Check if the move is within bounds, not visited, and not an obstacle."""
+    rows, cols = len(grid), len(grid[0])
+    return 0 <= x < rows and 0 <= y < cols and not visited[x][y] and grid[x][y] != '#'
+
+def get_neighbors(grid, x, y, visited):
+    """Get all valid neighboring positions for the vacuum cleaner."""
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  
+    neighbors = []
+    for dx, dy in directions:
+        nx, ny = x + dx, y + dy
+        if is_valid_move(grid, nx, ny, visited):
+            neighbors.append((nx, ny))
+    return neighbors
+
+def vacuum_cleaner(grid):
+    """
+    Perform cleaning task in a grid environment.
+    '#' - Obstacle
+    '.' - Clean cell
+    '*' - Dirty cell
+    'S' - Starting position of the vacuum cleaner
+    """
+    rows, cols = len(grid), len(grid[0])
+    
+    dirty_cells = set()
+    start = None
+    
+    for i in range(rows):
+        for j in range(cols):
+            if grid[i][j] == 'S':
+                start = (i, j)
+            elif grid[i][j] == '*':
+                dirty_cells.add((i, j))
+    
+    queue = deque([(start, 0)])  
+    visited = [[False for _ in range(cols)] for _ in range(rows)]
+    visited[start[0]][start[1]] = True
+    
+    cleaned_cells = 0
+    total_steps = 0
+    
+    while queue:
+        (x, y), steps = queue.popleft()
+        
+        if (x, y) in dirty_cells:
+            cleaned_cells += 1
+            dirty_cells.remove((x, y))
+            total_steps += steps
+            steps = 0  
+        
+        if cleaned_cells == len(dirty_cells) + 1:
+            return total_steps
+        
+        for nx, ny in get_neighbors(grid, x, y, visited):
+            visited[nx][ny] = True
+            queue.append(((nx, ny), steps + 1))
+    
+    return total_steps
+
+grid = [
+    ['S', '.', '.', '#', '*'],
+    ['.', '#', '.', '.', '.'],
+    ['.', '.', '#', '.', '*'],
+    ['#', '.', '.', '.', '.'],
+    ['*', '.', '#', '.', '.']
+]
+
+steps = vacuum_cleaner(grid)
+print(f"Total steps taken to clean all dirty cells: {steps}")
