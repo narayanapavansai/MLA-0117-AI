@@ -1,0 +1,71 @@
+from collections import deque
+
+def is_valid(state):
+    """Check if a state is valid."""
+    left_m, left_c, right_m, right_c, _ = state  
+    
+    if any(x < 0 for x in (left_m, left_c, right_m, right_c)):
+        return False
+    
+    if (left_m > 0 and left_c > left_m) or (right_m > 0 and right_c > right_m):
+        return False
+    
+    return True
+
+def get_successors(state):
+    """Generate all possible valid successors from the current state."""
+    successors = []
+    left_m, left_c, right_m, right_c, boat = state
+    
+    
+    moves = [
+        (1, 0),  
+        (2, 0),  
+        (0, 1),  
+        (0, 2),  
+        (1, 1)   
+        ]
+    
+    for m, c in moves:
+        if boat == "left": 
+            new_state = (left_m - m, left_c - c, right_m + m, right_c + c, "right")
+        else: 
+            new_state = (left_m + m, left_c + c, right_m - m, right_c - c, "left")
+        
+        if is_valid(new_state):
+            successors.append(new_state)
+    
+    return successors
+
+def solve_missionaries_and_cannibals():
+    """Solve the Missionaries and Cannibals problem."""
+    initial_state = (3, 3, 0, 0, "left") 
+    goal_state = (0, 0, 3, 3, "right")   
+    
+
+    queue = deque([(initial_state, [])]) 
+    visited = set()
+    visited.add(initial_state)
+    
+    while queue:
+        current_state, path = queue.popleft()
+        
+        if current_state == goal_state:
+            return path + [current_state]
+        
+        for successor in get_successors(current_state):
+            if successor not in visited:
+                visited.add(successor)
+                queue.append((successor, path + [current_state]))
+    
+    return None 
+
+solution = solve_missionaries_and_cannibals()
+
+if solution:
+    print("Solution found!")
+    for step, state in enumerate(solution):
+        left_m, left_c, right_m, right_c, boat = state
+        print(f"Step {step}: Left = ({left_m}M, {left_c}C), Right = ({right_m}M, {right_c}C), Boat = {boat}")
+else:
+    print("No solution found.")
