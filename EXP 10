@@ -1,0 +1,70 @@
+from queue import PriorityQueue
+
+def best_first_search(graph, start, goal, heuristic):
+    """
+    Implements the Best First Search algorithm.
+
+    Parameters:
+    - graph: A dictionary where keys are nodes and values are lists of tuples (neighbor, cost).
+    - start: The starting node.
+    - goal: The goal node.
+    - heuristic: A dictionary with heuristic values for each node.
+
+    Returns:
+    - path: A list of nodes representing the path from start to goal.
+    """
+    open_list = PriorityQueue()
+    open_list.put((heuristic[start], start))  
+    visited = set()
+
+    came_from = {}
+
+    while not open_list.empty():
+        _, current = open_list.get()
+
+        if current == goal:
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            return path[::-1]
+
+        visited.add(current)
+
+        for neighbor, _ in graph.get(current, []):
+            if neighbor not in visited:
+                open_list.put((heuristic[neighbor], neighbor))
+                if neighbor not in came_from:
+                    came_from[neighbor] = current
+
+    return None  
+
+graph = {
+    'A': [('B', 1), ('C', 2)],
+    'B': [('D', 4), ('E', 1)],
+    'C': [('F', 5)],
+    'D': [],
+    'E': [('G', 1)],
+    'F': [('G', 2)],
+    'G': []
+}
+
+heuristic = {
+    'A': 6,
+    'B': 4,
+    'C': 5,
+    'D': 3,
+    'E': 2,
+    'F': 6,
+    'G': 0
+}
+
+start = 'A'
+goal = 'G'
+
+path = best_first_search(graph, start, goal, heuristic)
+if path:
+    print("Path from", start, "to", goal, ":", path)
+else:
+    print("No path found from", start, "to", goal)
