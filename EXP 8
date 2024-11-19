@@ -1,0 +1,30 @@
+def dfs(graph, start, visited=None):
+    """
+    Perform Depth First Search on a graph.
+
+    :param graph: A dictionary representing the adjacency list of the graph.
+    :param start: The starting node for DFS.
+    :param visited: A set to keep track of visited nodes.
+    """
+    if visited is None:
+        visited = set()
+
+    visited.add(start)
+    print(start, end=' ')
+
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            dfs(graph, neighbor, visited)
+
+if __name__ == "__main__":
+    graph = {
+        'A': ['B', 'C'],
+        'B': ['D', 'E'],
+        'C': ['F'],
+        'D': [],
+        'E': ['F'],
+        'F': []
+    }
+
+    print("DFS traversal starting from node A:")
+    dfs(graph, 'A')
