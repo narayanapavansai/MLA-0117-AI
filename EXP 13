@@ -1,0 +1,41 @@
+import random
+
+def objective_function(x):
+    """
+    Define the objective function to maximize or minimize.
+    Example: -x^2 + 5
+    """
+    return -x**2 + 5
+
+def hill_climbing(objective, x_start, step_size, max_iterations):
+    """
+    Implements the Hill Climbing algorithm.
+    :param objective: Function to optimize
+    :param x_start: Initial guess
+    :param step_size: Step size for exploring neighbors
+    :param max_iterations: Maximum number of iterations
+    :return: Best solution found and its value
+    """
+    x_current = x_start
+    value_current = objective(x_current)
+
+    for iteration in range(max_iterations):
+        x_neighbor = x_current + random.uniform(-step_size, step_size)
+        value_neighbor = objective(x_neighbor)
+
+        if value_neighbor > value_current:
+            x_current = x_neighbor
+            value_current = value_neighbor
+            print(f"Iteration {iteration+1}: Found better solution: x = {x_current}, value = {value_current}")
+
+    return x_current, value_current
+
+
+x_start = random.uniform(-10, 10)  
+step_size = 0.1  
+max_iterations = 100  
+
+best_solution, best_value = hill_climbing(objective_function, x_start, step_size, max_iterations)
+
+print("\nBest solution found:")
+print(f"x = {best_solution}, value = {best_value}")
